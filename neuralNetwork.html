@@ -6,14 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>NeuralNetwork from sonar.software</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
       #pulse {
         background: #0b101b;
         color: #fff;
-        height: 800px;
+        height: 100vh;
         width: 100%;
-      }
-      .section {
-        padding: 60px 0;
       }
       #neuralNetwork {
         display: inline-block;
@@ -111,13 +112,12 @@
     }
     var o = this;
     o.neuralNetwork = !0;
-    var i = 550,
+    var i = window.innerHeight || 550,
       s = document.getElementById("neuralNetwork"),
       u = $(s).parent(),
       l = s.width = u.width(),
       c = s.height = Math.min(u.height(), i),
       d = s.getContext("2d");
-    console.log(u.height(), i)
     opts = {
         georgeGlowSize: 1,
         georgeGlowSizeModifier: .005,
