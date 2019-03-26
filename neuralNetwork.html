@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>NeuralNetwork from sonar.software</title>
+    <style>
+      #pulse {
+        background: #0b101b;
+        color: #fff;
+        height: 800px;
+        width: 100%;
+      }
+      .section {
+        padding: 60px 0;
+      }
+      #neuralNetwork {
+        display: inline-block;
+        vertical-align: baseline;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: .8;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pulse" class="section">
+      <canvas id="neuralNetwork" width="816" height="550"></canvas>
+    </div>
+  </body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+  function initNeuralNetwork() {
+    function e() {
+      connections.length = 0,
+        data.length = 0,
+        all.length = 0,
+        toDevelop.length = 0;
+      var e = new t(0, 0, 0, opts.baseSize);
+      for (e.step = t.rootStep,
+        connections.push(e),
+        all.push(e),
+        e.link(); toDevelop.length > 0;)
+        toDevelop[0].link(),
+        toDevelop.shift();
+      animating || (animating = !0,
+        r())
+    }
+
+    function t(e, t, n, a) {
+      this.x = e,
+        this.y = t,
+        this.z = n,
+        this.size = a,
+        this.screen = {},
+        this.links = [],
+        this.probabilities = [],
+        this.isEnd = !1,
+        this.glowSpeed = opts.baseGlowSpeed + opts.addedGlowSpeed * Math.random()
+    }
+
+    function n(e) {
+      this.glowSpeed = opts.baseGlowSpeed + opts.addedGlowSpeed * Math.random(),
+        this.speed = opts.baseSpeed + opts.addedSpeed * Math.random(),
+        this.screen = {},
+        this.setConnection(e)
+    }
+
+    function a(e, t) {
+      var n = t.x - e.x,
+        a = t.y - e.y,
+        r = t.z - e.z;
+      return n * n + a * a + r * r
+    }
+
+    function r() {
+      window.requestAnimationFrame(r),
+        d.globalCompositeOperation = "source-over",
+        d.fillStyle = opts.repaintColor,
+        d.fillRect(0, 0, l, c),
+        ++tick;
+      var e = tick * opts.rotVelX,
+        t = tick * opts.rotVelY;
+      if (cosX = Math.cos(e),
+        sinX = Math.sin(e),
+        cosY = Math.cos(t),
+        sinY = Math.sin(t),
+        data.length < connections.length * opts.dataToConnections) {
+        var a = new n(connections[0]);
+        data.push(a),
+          all.push(a)
+      }
+      d.globalCompositeOperation = "lighter",
+        d.beginPath(),
+        d.lineWidth = opts.wireframeWidth,
+        d.strokeStyle = opts.wireframeColor,
+        all.map(function (e) {
+          e.step()
+        }),
+        d.stroke(),
+        d.globalCompositeOperation = "source-over",
+        all.sort(function (e, t) {
+          return t.screen.z - e.screen.z
+        }),
+        all.map(function (e) {
+          e.draw()
+        })
+    }
+    var o = this;
+    o.neuralNetwork = !0;
+    var i = 550,
+      s = document.getElementById("neuralNetwork"),
+      u = $(s).parent(),
+      l = s.width = u.width(),
+      c = s.height = Math.min(u.height(), i),
+      d = s.getContext("2d");
+    console.log(u.height(), i)
+    opts = {
+        georgeGlowSize: 1,
+        georgeGlowSizeModifier: .005,
+        range: 200,
+        baseConnections: 4,
+        addedConnections: 5,
+        baseSize: 4,
+        minSize: 1,
+        dataToConnectionSize: .4,
+        sizeMultiplier: .7,
+        allowedDist: 40,
+        baseDist: 80,
+        addedDist: 30,
+        connectionAttempts: 100,
+        dataToConnections: 1,
+        baseSpeed: .009,
+        addedSpeed: .001,
+        baseGlowSpeed: 0,
+        addedGlowSpeed: 0,
+        rotVelX: 35e-5,
+        rotVelY: 35e-5,
+        repaintColor: $("#pulse").css("background-color"),
+        rootColor: "#0099FF",
+        dataColor: "#0099FF",
+        connectionColor: "#19e5e6",
+        endColor: "#b1d6d6",
+        wireframeWidth: 1e-4,
+        wireframeColor: "#88f",
+        depth: 250,
+        focalLength: 350,
+        vanishPoint: {
+          x: l / 2,
+          y: c / 2
+        }
+      },
+      squareRange = opts.range * opts.range,
+      squareAllowed = opts.allowedDist * opts.allowedDist,
+      mostDistant = opts.depth + opts.range,
+      sinX = sinY = 0,
+      cosX = cosY = 0,
+      connections = [],
+      toDevelop = [],
+      data = [],
+      all = [],
+      tick = 0,
+      totalProb = 0,
+      animating = !1,
+      Tau = 2 * Math.PI,
+      window.setTimeout(e, 4),
+      t.prototype.link = function () {
+        if (this.size < opts.minSize)
+          return this.isEnd = !0;
+        for (var e, n, r, o, i, s, u, l, c, d = [], f = opts.baseConnections + Math.random() * opts
+            .addedConnections | 0, h = opts.connectionAttempts, p = {}; d.length < f && --h > 0;)
+          if (e = Math.random() * Math.PI,
+            n = Math.random() * Tau,
+            r = opts.baseDist + opts.addedDist * Math.random(),
+            o = Math.cos(e),
+            i = Math.sin(e),
+            s = Math.cos(n),
+            u = Math.sin(n),
+            p.x = this.x + r * o * u,
+            p.y = this.y + r * i * u,
+            p.z = this.z + r * s,
+            p.x * p.x + p.y * p.y + p.z * p.z < squareRange) {
+            l = !0,
+              c = !0;
+            for (var m = 0; m < connections.length; ++m)
+              a(p, connections[m]) < squareAllowed && (l = !1);
+            if (l)
+              for (var m = 0; m < d.length; ++m)
+                a(p, d[m]) < squareAllowed && (c = !1);
+            l && c && d.push({
+              x: p.x,
+              y: p.y,
+              z: p.z
+            })
+          }
+        if (0 === d.length)
+          this.isEnd = !0;
+        else {
+          for (var m = 0; m < d.length; ++m) {
+            var p = d[m],
+              g = new t(p.x, p.y, p.z, this.size * opts.sizeMultiplier);
+            this.links[m] = g,
+              all.push(g),
+              connections.push(g)
+          }
+          for (var m = 0; m < this.links.length; ++m)
+            toDevelop.push(this.links[m])
+        }
+      },
+      t.prototype.step = function () {
+        this.setScreen(),
+          this.screen.color = (this.isEnd ? opts.endColor : opts.connectionColor).replace("light", 30 + tick *
+            this.glowSpeed % 30).replace("alp", .2 + .8 * (1 - this.screen.z / mostDistant));
+        for (var e = 0; e < this.links.length; ++e)
+          d.moveTo(this.screen.x, this.screen.y),
+          d.lineTo(this.links[e].screen.x, this.links[e].screen.y)
+      },
+      t.rootStep = function () {
+        this.setScreen(3),
+          this.screen.color = opts.rootColor.replace("light", 30 + tick * this.glowSpeed % 30).replace("alp",
+            .8 * (1 - this.screen.z / mostDistant)),
+          this.isRoot = !0;
+        for (var e = 0; e < this.links.length; ++e)
+          d.moveTo(this.screen.x, this.screen.y),
+          d.lineTo(this.links[e].screen.x, this.links[e].screen.y)
+      },
+      t.prototype.draw = function () {
+        this.isRoot && (opts.georgeGlowSize >= 1.8 && (opts.georgeGlowSizeModifier = -.005),
+            opts.georgeGlowSize <= 1.4 && (opts.georgeGlowSizeModifier = .005),
+            opts.georgeGlowSize += opts.georgeGlowSizeModifier,
+            d.beginPath(),
+            d.fillStyle = "rgba(0, 153, 255, 0.4)",
+            d.arc(this.screen.x, this.screen.y, this.screen.scale * this.size * opts.georgeGlowSize, 0,
+              Tau),
+            d.fill()),
+          d.beginPath(),
+          d.fillStyle = this.screen.color,
+          d.arc(this.screen.x, this.screen.y, this.screen.scale * this.size, 0, Tau),
+          d.fill()
+      },
+      n.prototype.reset = function () {
+        this.setConnection(connections[0]),
+          this.ended = 2
+      },
+      n.prototype.step = function () {
+        this.proportion += this.speed,
+          this.proportion < 1 ? (this.x = this.ox + this.dx * this.proportion,
+            this.y = this.oy + this.dy * this.proportion,
+            this.z = this.oz + this.dz * this.proportion,
+            this.size = (this.os + this.ds * this.proportion) * opts.dataToConnectionSize) : this
+          .setConnection(this.nextConnection),
+          this.screen.lastX = this.screen.x,
+          this.screen.lastY = this.screen.y,
+          this.setScreen(),
+          this.screen.color = opts.dataColor
+      },
+      n.prototype.draw = function () {
+        return this.ended ? --this.ended : (d.beginPath(),
+          d.strokeStyle = this.screen.color,
+          d.lineWidth = this.size * this.screen.scale,
+          d.moveTo(this.screen.lastX, this.screen.lastY),
+          d.lineTo(this.screen.x, this.screen.y),
+          void d.stroke())
+      },
+      n.prototype.setConnection = function (e) {
+        e.isEnd ? this.reset() : (this.connection = e,
+          this.nextConnection = e.links[e.links.length * Math.random() | 0],
+          this.ox = e.x,
+          this.oy = e.y,
+          this.oz = e.z,
+          this.os = e.size,
+          this.nx = this.nextConnection.x,
+          this.ny = this.nextConnection.y,
+          this.nz = this.nextConnection.z,
+          this.ns = this.nextConnection.size,
+          this.dx = this.nx - this.ox,
+          this.dy = this.ny - this.oy,
+          this.dz = this.nz - this.oz,
+          this.ds = this.ns - this.os,
+          this.proportion = 0)
+      },
+      t.prototype.setScreen = n.prototype.setScreen = function (e) {
+        e = e || 1;
+        var t = this.x,
+          n = this.y,
+          a = this.z,
+          r = n;
+        n = n * cosX - a * sinX,
+          a = a * cosX + r * sinX;
+        var o = a;
+        a = a * cosY - t * sinY,
+          t = t * cosY + o * sinY,
+          this.screen.z = a,
+          a += opts.depth,
+          this.screen.scale = opts.focalLength * e / a,
+          this.screen.x = opts.vanishPoint.x + t * this.screen.scale,
+          this.screen.y = opts.vanishPoint.y + n * this.screen.scale
+      },
+      window.addEventListener("resize", function () {
+        opts.vanishPoint.x = (l = s.width = u.width()) / 2,
+          opts.vanishPoint.y = (c = s.height = Math.min(u.height(), i)) / 2,
+          d.fillRect(0, 0, l, c)
+      })
+  }
+  initNeuralNetwork()
+</script>
